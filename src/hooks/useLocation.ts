@@ -45,6 +45,7 @@ export const prepareSetLocationUrl = (args: string | TOpenRouteParams): string =
 
   // in each case, add base URL
   urlToPush = addBaseToUrl(urlToPush);
+  debug('urlToPush',urlToPush)
   return urlToPush;
 };
 

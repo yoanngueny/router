@@ -1,7 +1,11 @@
-import { RouterInstance, TRoute } from "./RouterInstance";
+import { CreateRouter, TRoute } from "./CreateRouter";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 
 export type TRoutersConfig = {
+  /**
+   * First level base URL
+   */
+  base: string;
   /**
    * Global routes list
    */
@@ -9,7 +13,7 @@ export type TRoutersConfig = {
   /**
    * Routers instances list
    */
-  instances: RouterInstance[];
+  instances: CreateRouter[];
   /**
    * Global browser history
    */
@@ -34,6 +38,7 @@ export type TRoutersConfig = {
  * This object values do not depend of one single router
  */
 export const ROUTERS: TRoutersConfig = {
+  base: null,
   routes: null,
   instances: [],
   history: null,

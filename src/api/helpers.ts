@@ -1,7 +1,8 @@
 import { Path } from "path-parser";
-import { TRoute } from "./RouterInstance";
+import { TRoute } from "./CreateRouter";
 import LanguagesService from "..";
 import { useRootRouter } from "../hooks/useRouter";
+import { ROUTERS } from "./routers";
 const debug = require("debug")("router:helpers");
 
 export type TParams = { [x: string]: any };
@@ -175,7 +176,7 @@ export const addLangToUrl = (
  * @param url
  * @param base
  */
-export const addBaseToUrl = (url: string, base = useRootRouter()?.base): string => {
+export const addBaseToUrl = (url: string, base = ROUTERS.base): string => {
   url = joinPaths([base === "/" ? "" : base, url]);
   return url;
 };

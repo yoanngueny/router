@@ -21,23 +21,22 @@ export default function App() {
   }, [count]);
 
   useEffect(() => {
-    LangService.redirect();
+   // LangService.redirect();
   }, []);
 
-  const [lang, setLang] = useLang();
 
   return (
     <div className={componentName}>
       <button
         onClick={() => {
-          setLang("en");
+          LangService.setLang({ key: "en" });
         }}
       >
         CHANGE LANGUAGE TO EN
       </button>
       <button
         onClick={() => {
-          setLang("fr");
+          LangService.setLang({ key: "fr" });
         }}
       >
         CHANGE LANGUAGE TO FR

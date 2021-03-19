@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import * as React from "react";
 import { forwardRef } from "react";
-import { EHistoryMode, Router, TRoute } from "../src";
+import { CreateRouter, EHistoryMode, Router, TRoute } from "../src";
 import LangService from "../src";
 import { langMiddleware } from "../src";
 
@@ -12,6 +12,7 @@ import ArticlePage from "./pages/ArticlePage";
 import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import "./index.css";
+import { createBrowserHistory } from "history";
 
 const debug = require("debug")(`router:index`);
 
@@ -51,19 +52,24 @@ export const routesList: TRoute[] = [
 ];
 
 const baseUrl = "/master";
-const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
-LangService.init(locales, true, baseUrl);
+// TODO si showDefaultLangInUrl is true - la base sur sous router doit être modifié a chaque changement type
+// TODO  const base = isCurrentLang ? /base/path : /base/:lang/path
+// TODO ce n'est pas pratique. Il faudrait que CreateRouter s'en charge lui même.
+
+LangService.init([{ key: "en" }, { key: "fr" }, { key: "de" }], true, baseUrl);
+
+const router = new CreateRouter({
+  routes: routesList,
+  base: baseUrl,
+  middlewares: [langMiddleware],
+});
+
 
 /**
  * Init Application
  */
 ReactDOM.render(
-  <Router
-    routes={routesList}
-    base={baseUrl}
-    middlewares={[langMiddleware]}
-    historyMode={EHistoryMode.BROWSER}
-  >
+  <Router router={router}>
     <App />
   </Router>,
   document.getElementById("root")

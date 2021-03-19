@@ -5,14 +5,12 @@ import { buildUrl, joinPaths } from "./helpers";
 import { ROUTERS } from "./routers";
 import {
   createBrowserHistory,
-  createHashHistory,
-  createMemoryHistory,
   BrowserHistory,
   HashHistory,
   MemoryHistory,
 } from "history";
 
-const debug = require("debug")("router:RouterInstance");
+const debug = require("debug")("router:CreateRouter");
 
 export type TRoute = {
   path: string;
@@ -32,12 +30,6 @@ export type TRoute = {
   fullPath?: string;
 };
 
-export enum EHistoryMode {
-  BROWSER = "browser",
-  HASH = "hash",
-  MEMORY = "memory",
-}
-
 export enum ERouterEvent {
   PREVIOUS_ROUTE_CHANGE = "previous-route-change",
   CURRENT_ROUTE_CHANGE = "current-route-change",
@@ -45,9 +37,9 @@ export enum ERouterEvent {
 }
 
 /**
- * RouterInstance
+ * CreateRouter
  */
-export class RouterInstance {
+export class CreateRouter {
   // base URL
   public base: string;
   // routes list
@@ -64,40 +56,43 @@ export class RouterInstance {
   public currentRoute: TRoute;
   public previousRoute: TRoute;
 
-  // history mode choice used by history library›
-  public historyMode: EHistoryMode;
+  // history mode choice used by history library
+  public history: HashHistory | MemoryHistory | BrowserHistory;
 
   // store history listener
   protected unlistenHistory;
 
+  // TODO : il faudrait de l'auto détection du numéro d'instance et que ce ne soit pas une propriété
   // router instance ID, useful for debug if there is multiple router instance
   public id: number | string;
 
   constructor({
     base = "/",
     routes = null,
-    middlewares,
+    history = createBrowserHistory(),
     id = 1,
-    historyMode,
+    middlewares,
   }: {
     base?: string;
     routes?: TRoute[];
     middlewares?: any[];
     id?: number | string;
-    historyMode: EHistoryMode;
+    history?: HashHistory | MemoryHistory | BrowserHistory;
   }) {
     this.base = base;
+    if (!ROUTERS.base) ROUTERS.base = this.base;
+
     this.id = id;
     this.middlewares = middlewares;
-    this.historyMode = historyMode;
+    this.history = history;
 
     if (!routes) {
       throw new Error(`Router id ${id} > no routes array is set.`);
     }
 
     if (!ROUTERS.history) {
-      debug("No ROUTERS.history exist, create a new one", this.historyMode);
-      ROUTERS.history = this.getHistory(this.historyMode);
+      debug("No ROUTERS.history exist, create a new one", this.history);
+      ROUTERS.history = this.history;
 
       // push first location history object in global locationsHistory
       ROUTERS.locationsHistory.push(ROUTERS.history.location);
@@ -143,28 +138,6 @@ export class RouterInstance {
   public destroyEvents(): void {
     // To stop listening, call the function returned from listen().
     this.unlistenHistory();
-  }
-
-  /**
-   * Select History mode
-   * doc: https://github.com/ReactTraining/history/blob/master/docs/getting-started.md
-   * @param historyMode
-   */
-  protected getHistory(
-    historyMode: EHistoryMode
-  ): HashHistory | MemoryHistory | BrowserHistory {
-    if (historyMode === EHistoryMode.HASH) {
-      return createHashHistory();
-    }
-    if (historyMode === EHistoryMode.MEMORY) {
-      return createMemoryHistory();
-    }
-    if (historyMode === EHistoryMode.BROWSER) {
-      return createBrowserHistory();
-    }
-
-    // in other case, return a browser history
-    return createBrowserHistory();
   }
 
   /**
